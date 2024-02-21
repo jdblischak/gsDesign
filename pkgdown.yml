@@ -1,0 +1,21 @@
+pandoc: 2.19.2
+pkgdown: 2.0.7
+pkgdown_sha: ~
+articles:
+  GentleIntroductionToGSD: GentleIntroductionToGSD.html
+  GraphicalMultiplicity: GraphicalMultiplicity.html
+  PoissonMixtureModel: PoissonMixtureModel.html
+  SpendingFunctionOverview: SpendingFunctionOverview.html
+  SurvivalOverview: SurvivalOverview.html
+  VaccineEfficacy: VaccineEfficacy.html
+  binomialSPRTExample: binomialSPRTExample.html
+  gsDesignPackageOverview: gsDesignPackageOverview.html
+  gsSurvBasicExamples: gsSurvBasicExamples.html
+  hGraph: hGraph.html
+  nNormal: nNormal.html
+  toInteger: toInteger.html
+last_built: 2024-02-21T20:42Z
+urls:
+  reference: https://keaven.github.io/gsDesign/reference
+  article: https://keaven.github.io/gsDesign/articles
+
