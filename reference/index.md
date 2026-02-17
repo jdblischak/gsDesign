@@ -66,6 +66,12 @@ For an overview of the gsDesign package, see
 
 ## Time-to-Event Endpoint Design
 
+Early, independent and more limited implementation of Lachin and Foulkes
+methods are in
+[`nSurvival()`](https://keaven.github.io/gsDesign/reference/nSurvival.md)
+and
+[`print.nSurvival()`](https://keaven.github.io/gsDesign/reference/nSurvival.md).
+
 - [`print(`*`<nSurvival>`*`)`](https://keaven.github.io/gsDesign/reference/nSurvival.md)
   [`nSurvival()`](https://keaven.github.io/gsDesign/reference/nSurvival.md)
   [`nEvents()`](https://keaven.github.io/gsDesign/reference/nSurvival.md)
@@ -73,16 +79,16 @@ For an overview of the gsDesign package, see
   [`hrn2z()`](https://keaven.github.io/gsDesign/reference/nSurvival.md)
   [`hrz2n()`](https://keaven.github.io/gsDesign/reference/nSurvival.md)
   : Time-to-event sample size calculation (Lachin-Foulkes)
-- [`print(`*`<nSurv>`*`)`](https://keaven.github.io/gsDesign/reference/nSurv.md)
-  [`nSurv()`](https://keaven.github.io/gsDesign/reference/nSurv.md)
-  [`tEventsIA()`](https://keaven.github.io/gsDesign/reference/nSurv.md)
+- [`tEventsIA()`](https://keaven.github.io/gsDesign/reference/nSurv.md)
   [`nEventsIA()`](https://keaven.github.io/gsDesign/reference/nSurv.md)
+  [`nSurv()`](https://keaven.github.io/gsDesign/reference/nSurv.md)
+  [`print(`*`<nSurv>`*`)`](https://keaven.github.io/gsDesign/reference/nSurv.md)
+  [`xtable(`*`<gsSurv>`*`)`](https://keaven.github.io/gsDesign/reference/nSurv.md)
   [`gsSurv()`](https://keaven.github.io/gsDesign/reference/nSurv.md)
   [`print(`*`<gsSurv>`*`)`](https://keaven.github.io/gsDesign/reference/nSurv.md)
-  [`xtable(`*`<gsSurv>`*`)`](https://keaven.github.io/gsDesign/reference/nSurv.md)
   : Advanced time-to-event sample size calculation
 - [`gsSurvCalendar()`](https://keaven.github.io/gsDesign/reference/gsSurvCalendar.md)
-  : Time-to-event endpoint design with calendar timing of analyses
+  : Group sequential design with calendar-based timing of analyses
 - [`summary(`*`<gsDesign>`*`)`](https://keaven.github.io/gsDesign/reference/gsBoundSummary.md)
   [`print(`*`<gsDesign>`*`)`](https://keaven.github.io/gsDesign/reference/gsBoundSummary.md)
   [`gsBoundSummary()`](https://keaven.github.io/gsDesign/reference/gsBoundSummary.md)
