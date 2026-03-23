@@ -20,6 +20,8 @@ gsSurvCalendar(
   sfupar = -4,
   sfl = gsDesign::sfHSD,
   sflpar = -2,
+  sfharm = gsDesign::sfHSD,
+  sfharmparam = -2,
   calendarTime = c(12, 24, 36),
   spending = c("information", "calendar"),
   lambdaC = log(2)/6,
@@ -34,6 +36,9 @@ gsSurvCalendar(
   ratio = 1,
   r = 18,
   tol = .Machine$double.eps^0.25,
+  testUpper = TRUE,
+  testLower = TRUE,
+  testHarm = TRUE,
   method = c("LachinFoulkes", "Schoenfeld", "Freedman", "BernsteinLagakos")
 )
 ```
@@ -50,8 +55,12 @@ gsSurvCalendar(
   `5=`two-sided, asymmetric, lower bound spending under the null
   hypothesis with binding lower bound  
   `6=`two-sided, asymmetric, lower bound spending under the null
-  hypothesis with non-binding lower bound.  
-  See details, examples, and manual.
+  hypothesis with non-binding lower bound  
+  `7=`two-sided, asymmetric, with binding futility and binding harm
+  bounds  
+  `8=`two-sided, asymmetric, with non-binding futility and non-binding
+  harm bounds.  
+  See details, examples and manual.
 
 - alpha:
 
@@ -68,30 +77,36 @@ gsSurvCalendar(
 
 - astar:
 
-  Normally not specified. If `test.type = 5` or `6`, `astar` specifies
-  the total probability of crossing a lower bound at all analyses
-  combined. This will be changed to `1 - alpha` when default value of
-  `0` is used. Since this is the expected usage, normally `astar` is not
-  specified by the user.
+  Total spending for the lower (test.type 5 or 6) or harm (test.type 7
+  or 8) bound under the null hypothesis. Default is 0. For `test.type` 5
+  or 6, `astar` specifies the total probability of crossing a lower
+  bound at all analyses combined. For `test.type` 7 or 8, `astar`
+  specifies the total probability of crossing the harm bound at all
+  analyses combined under the null hypothesis. If `astar = 0`, it will
+  be changed to \\1 - \\`alpha`.
 
 - sfu:
 
   A spending function or a character string indicating a boundary type
-  (that is, `"WT"` for Wang-Tsiatis bounds, `"OF"` for O'Brien-Fleming
-  bounds and `"Pocock"` for Pocock bounds). For one-sided and symmetric
+  (that is, “WT” for Wang-Tsiatis bounds, “OF” for O'Brien-Fleming
+  bounds and “Pocock” for Pocock bounds). For one-sided and symmetric
   two-sided testing is used to completely specify spending
-  (`test.type = 1`, `2`), `sfu`. The default value is `sfHSD` which is a
-  Hwang-Shih-DeCani spending function.
+  (`test.type=1, 2`), `sfu`. The default value is `sfHSD` which is a
+  Hwang-Shih-DeCani spending function. See details,
+  [`vignette("SpendingFunctionOverview")`](https://keaven.github.io/gsDesign/articles/SpendingFunctionOverview.md),
+  manual and examples.
 
 - sfupar:
 
-  Real value, default is `-4` which is an O'Brien-Fleming-like
+  Real value, default is \\-4\\ which is an O'Brien-Fleming-like
   conservative bound when used with the default Hwang-Shih-DeCani
   spending function. This is a real-vector for many spending functions.
   The parameter `sfupar` specifies any parameters needed for the
-  spending function specified by `sfu`; this will be ignored for
-  spending functions (`sfLDOF`, `sfLDPocock`) or bound types (`"OF"`,
-  `"Pocock"`) that do not require parameters.
+  spending function specified by `sfu`; this is not needed for spending
+  functions (`sfLDOF`, `sfLDPocock`) or bound types (“OF”, “Pocock”)
+  that do not require parameters. Note that `sfupar` can be specified as
+  a positive scalar for `sfLDOF` for a generalized O'Brien-Fleming
+  spending function.
 
 - sfl:
 
@@ -100,14 +115,27 @@ gsSurvCalendar(
   (`test.type = 3`, `4`, `5`, or `6`). Unlike the upper bound, only
   spending functions are used to specify the lower bound. The default
   value is `sfHSD` which is a Hwang-Shih-DeCani spending function. The
-  parameter `sfl` is ignored for one-sided testing (`test.type = 1`) or
-  symmetric 2-sided testing (`test.type = 2`).
+  parameter `sfl` is ignored for one-sided testing (`test.type=1`) or
+  symmetric 2-sided testing (`test.type=2`). See details, spending
+  functions, manual and examples.
 
 - sflpar:
 
-  Real value, default is `-2`, which, with the default Hwang-Shih-DeCani
-  spending function, specifies a less conservative spending rate than
-  the default for the upper bound.
+  Real value, default is \\-2\\, which, with the default
+  Hwang-Shih-DeCani spending function, specifies a less conservative
+  spending rate than the default for the upper bound.
+
+- sfharm:
+
+  A spending function for the harm bound, used with `test.type = 7` or
+  `test.type = 8`. Default is `sfHSD`. See
+  [`spendingFunction`](https://keaven.github.io/gsDesign/reference/spendingFunction.md)
+  for details.
+
+- sfharmparam:
+
+  Real value, default is \\-2\\. Parameter for the harm bound spending
+  function `sfharm`.
 
 - calendarTime:
 
@@ -122,17 +150,20 @@ gsSurvCalendar(
 
   Scalar, vector or matrix of event hazard rates for the control group;
   rows represent time periods while columns represent strata; a vector
-  implies a single stratum.
+  implies a single stratum. Note that rates corresponding the final time
+  period are extended indefinitely.
 
 - hr:
 
   Hazard ratio (experimental/control) under the alternate hypothesis
-  (scalar).
+  (scalar, \> 0, must differ from `hr0`). Both `hr < hr0` (experimental
+  is beneficial when lower hazard is better) and `hr > hr0` (e.g.,
+  time-to-response or safety designs) are supported.
 
 - hr0:
 
-  Hazard ratio (experimental/control) under the null hypothesis
-  (scalar).
+  Hazard ratio (experimental/control) under the null hypothesis (scalar,
+  \> 0, must differ from `hr`).
 
 - eta:
 
@@ -166,7 +197,8 @@ gsSurvCalendar(
   A scalar or vector of durations of piecewise constant event rates
   specified in rows of `lambda`, `eta` and `etaE`; this is `NULL` if
   there is a single event rate per stratum (exponential failure) or
-  length of the number of rows in `lambda` minus 1, otherwise.
+  length of the number of rows in `lambda` minus 1, otherwise. The final
+  time period is extended indefinitely for each stratum.
 
 - minfup:
 
@@ -196,13 +228,44 @@ gsSurvCalendar(
   [`gsDesign`](https://keaven.github.io/gsDesign/reference/gsDesign.md)
   function.
 
+- testUpper:
+
+  Indicator of which analyses should include an upper (efficacy) bound.
+  A single value of `TRUE` (default) indicates all analyses have an
+  efficacy bound. Otherwise, a logical vector of length `k` indicating
+  which analyses will have an efficacy bound. Overridden to all `TRUE`
+  for `test.type` 1 and 2. Must be `TRUE` at the final analysis to
+  achieve targeted power. At each analysis, at least one of `testUpper`,
+  `testLower`, or `testHarm` must be `TRUE`. Where `testUpper` is
+  `FALSE`, the upper bound is set to `+20` (effectively `Inf`) and
+  displayed as `NA` in output.
+
+- testLower:
+
+  Indicator of which analyses should include a lower (futility) bound. A
+  single value of `TRUE` (default) indicates all analyses have a lower
+  bound; `FALSE` indicates none. Otherwise, a logical vector of length
+  `k`. Ignored for `test.type` 1 (one-sided, no lower bound). Overridden
+  to all `TRUE` for `test.type` 2 (symmetric). For `test.type` 3–8, at
+  least one analysis must be `TRUE`. Where `testLower` is `FALSE`, the
+  lower bound is set to `-20` (effectively `-Inf`) and displayed as `NA`
+  in output.
+
+- testHarm:
+
+  Indicator of which analyses should include a harm bound. A single
+  value of `TRUE` (default) indicates all analyses have a harm bound;
+  `FALSE` indicates none. Otherwise, a logical vector of length `k`.
+  Only used for `test.type` 7 or 8; at least one analysis must be `TRUE`
+  for those types. Where `testHarm` is `FALSE`, the harm bound is set to
+  `-20` (effectively `-Inf`) and displayed as `NA` in output.
+
 - method:
 
-  Sample-size variance formulation; one of \`"LachinFoulkes"\`
-  (default), \`"Schoenfeld"\`, \`"Freedman"\`, or
-  \`"BernsteinLagakos"\`. Note: \`"Schoenfeld"\` and \`"Freedman"\`
-  methods only support superiority testing (\`hr0 = 1\`). Additionally,
-  \`"Freedman"\` does not support stratified populations.
+  One of `"LachinFoulkes"` (default), `"Schoenfeld"`, `"Freedman"`, or
+  `"BernsteinLagakos"`. Note: `"Schoenfeld"` and `"Freedman"` methods
+  only support superiority testing (`hr0 = 1`). `"Freedman"` does not
+  support stratified populations.
 
 ## References
 
@@ -211,6 +274,13 @@ Clinical Trials. *Biometrika*, 70, 659-663.
 
 Lan KKG and DeMets DL (1989), Group Sequential Procedures: Calendar vs.
 Information Time. *Statistics in Medicine*, 8, 1191-1198.
+
+Schoenfeld D (1981), The Asymptotic Properties of Nonparametric Tests
+for Comparing Survival Distributions. *Biometrika*, 68, 316-319.
+
+Freedman LS (1982), Tables of the Number of Patients Required in
+Clinical Trials Using the Logrank Test. *Statistics in Medicine*, 1,
+121-129.
 
 ## See also
 

@@ -1,5 +1,92 @@
 # Changelog
 
+## gsDesign (development version)
+
+### New features
+
+- Added `testUpper`, `testLower`, and `testHarm` parameters to
+  [`gsDesign()`](https://keaven.github.io/gsDesign/reference/gsDesign.md),
+  [`gsSurv()`](https://keaven.github.io/gsDesign/reference/nSurv.md),
+  and
+  [`gsSurvCalendar()`](https://keaven.github.io/gsDesign/reference/gsSurvCalendar.md)
+  for selective bound testing at interim analyses. Each accepts a
+  logical scalar or vector of length `k` specifying which analyses
+  should include that boundary. Inactive bounds are set to extreme
+  values (±20 on Z-scale) and displayed as `NA` in
+  [`print()`](https://rdrr.io/r/base/print.html) and
+  [`gsBoundSummary()`](https://keaven.github.io/gsDesign/reference/gsBoundSummary.md)
+  output. This enables designs such as futility-only at early interims,
+  deferred efficacy testing, or selective harm monitoring
+  ([@keaven](https://github.com/keaven),
+  [\#141](https://github.com/keaven/gsDesign/issues/141)).
+- Added `test.type = 7` (binding futility and binding harm bounds) and
+  `test.type = 8` (non-binding futility and non-binding harm bounds) to
+  [`gsDesign()`](https://keaven.github.io/gsDesign/reference/gsDesign.md),
+  [`gsSurv()`](https://keaven.github.io/gsDesign/reference/nSurv.md),
+  and
+  [`gsSurvCalendar()`](https://keaven.github.io/gsDesign/reference/gsSurvCalendar.md).
+  These three-boundary designs support monitoring for efficacy,
+  futility, and potential harm simultaneously, motivated by FDA guidance
+  on overall survival monitoring in oncology trials
+  ([@keaven](https://github.com/keaven),
+  [\#237](https://github.com/keaven/gsDesign/issues/237)).
+- New `sfharm` and `sfharmparam` parameters control the spending
+  function for the harm bound independently from efficacy and futility
+  spending ([@keaven](https://github.com/keaven),
+  [\#237](https://github.com/keaven/gsDesign/issues/237)).
+- All six [`plot()`](https://rdrr.io/r/graphics/plot.default.html)
+  types,
+  [`gsBoundSummary()`](https://keaven.github.io/gsDesign/reference/gsBoundSummary.md),
+  [`print()`](https://rdrr.io/r/base/print.html),
+  [`summary()`](https://rdrr.io/r/base/summary.html), and
+  [`xtable()`](https://keaven.github.io/gsDesign/reference/xtable.md)
+  methods support the new three-boundary designs
+  ([@keaven](https://github.com/keaven),
+  [\#237](https://github.com/keaven/gsDesign/issues/237)).
+- Added `HarmBound` vignette demonstrating harm bound design and
+  interpretation ([@keaven](https://github.com/keaven),
+  [\#237](https://github.com/keaven/gsDesign/issues/237)).
+- Survival design functions
+  ([`nEvents()`](https://keaven.github.io/gsDesign/reference/nSurvival.md),
+  [`nSurv()`](https://keaven.github.io/gsDesign/reference/nSurv.md),
+  [`gsSurv()`](https://keaven.github.io/gsDesign/reference/nSurv.md),
+  [`gsSurvCalendar()`](https://keaven.github.io/gsDesign/reference/gsSurvCalendar.md))
+  now support `hr > hr0` for time-to-event designs where a larger hazard
+  ratio is the alternative hypothesis. This enables direct specification
+  of designs for time-to-response, safety endpoints, or reversed HR
+  conventions. All sample size methods (Lachin-Foulkes, Schoenfeld,
+  Freedman, Bernstein-Lagakos) and plotting functions handle both
+  directions symmetrically ([@keaven](https://github.com/keaven),
+  [\#251](https://github.com/keaven/gsDesign/issues/251)).
+
+### Bug fixes
+
+- Fixed sign inconsistency in
+  [`hrn2z()`](https://keaven.github.io/gsDesign/reference/nSurvival.md)
+  which used `sign(hr0 - hr1)` while
+  [`zn2hr()`](https://keaven.github.io/gsDesign/reference/nSurvival.md)
+  used `sign(hr1 - hr0)`, preventing correct round-trip conversion. Both
+  now use `sign(hr1 - hr0)` ([@keaven](https://github.com/keaven),
+  [\#251](https://github.com/keaven/gsDesign/issues/251)).
+
+### Documentation
+
+- Consolidated shared roxygen2 `@param` documentation using
+  `@inheritParams` so that `test.type`, spending function parameters,
+  and other shared arguments are defined once in
+  [`gsDesign()`](https://keaven.github.io/gsDesign/reference/gsDesign.md)
+  or [`nSurv()`](https://keaven.github.io/gsDesign/reference/nSurv.md)
+  and inherited by
+  [`gsSurv()`](https://keaven.github.io/gsDesign/reference/nSurv.md) and
+  [`gsSurvCalendar()`](https://keaven.github.io/gsDesign/reference/gsSurvCalendar.md)
+  ([@keaven](https://github.com/keaven),
+  [\#237](https://github.com/keaven/gsDesign/issues/237)).
+- New vignette “Selective bound testing at interim analyses”
+  ([`vignette("SelectiveBoundTesting")`](https://keaven.github.io/gsDesign/articles/SelectiveBoundTesting.md))
+  with worked examples for all supported scenarios
+  ([@keaven](https://github.com/keaven),
+  [\#255](https://github.com/keaven/gsDesign/issues/255)).
+
 ## gsDesign 3.9.0 (February 2026)
 
 CRAN release: 2026-02-15

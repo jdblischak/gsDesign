@@ -10,14 +10,16 @@ articles:
   GraphicalMultiplicity: GraphicalMultiplicity.html
   gsDesignPackageOverview: gsDesignPackageOverview.html
   gsSurvBasicExamples: gsSurvBasicExamples.html
+  HarmBound: HarmBound.html
   hGraph: hGraph.html
   nNormal: nNormal.html
   PoissonMixtureModel: PoissonMixtureModel.html
+  SelectiveBoundTesting: SelectiveBoundTesting.html
   SpendingFunctionOverview: SpendingFunctionOverview.html
   SurvivalOverview: SurvivalOverview.html
   toInteger: toInteger.html
   VaccineEfficacy: VaccineEfficacy.html
-last_built: 2026-02-17T19:38Z
+last_built: 2026-03-23T15:20Z
 urls:
   reference: https://keaven.github.io/gsDesign/reference
   article: https://keaven.github.io/gsDesign/articles

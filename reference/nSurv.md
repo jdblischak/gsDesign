@@ -68,6 +68,8 @@ gsSurv(
   sfupar = -4,
   sfl = sfHSD,
   sflpar = -2,
+  sfharm = sfHSD,
+  sfharmparam = -2,
   r = 18,
   lambdaC = log(2)/6,
   hr = 0.6,
@@ -83,6 +85,9 @@ gsSurv(
   tol = .Machine$double.eps^0.25,
   usTime = NULL,
   lsTime = NULL,
+  testUpper = TRUE,
+  testLower = TRUE,
+  testHarm = TRUE,
   method = c("LachinFoulkes", "Schoenfeld", "Freedman", "BernsteinLagakos")
 )
 
@@ -141,12 +146,14 @@ print(x, digits = 3, show_gsDesign = FALSE, show_strata = TRUE, ...)
 - hr:
 
   Hazard ratio (experimental/control) under the alternate hypothesis
-  (scalar).
+  (scalar, \> 0, must differ from `hr0`). Both `hr < hr0` (experimental
+  is beneficial when lower hazard is better) and `hr > hr0` (e.g.,
+  time-to-response or safety designs) are supported.
 
 - hr0:
 
-  Hazard ratio (experimental/control) under the null hypothesis
-  (scalar).
+  Hazard ratio (experimental/control) under the null hypothesis (scalar,
+  \> 0, must differ from `hr`).
 
 - eta:
 
@@ -158,7 +165,7 @@ print(x, digits = 3, show_gsDesign = FALSE, show_strata = TRUE, ...)
 - etaE:
 
   Matrix dropout hazard rates for the experimental group specified in
-  like form as `eta`; if NULL, this is set equal to `eta`.
+  like form as `eta`; if `NULL`, this is set equal to `eta`.
 
 - gamma:
 
@@ -178,10 +185,10 @@ print(x, digits = 3, show_gsDesign = FALSE, show_strata = TRUE, ...)
 - S:
 
   A scalar or vector of durations of piecewise constant event rates
-  specified in rows of `lambda`, `eta` and `etaE`; this is NULL if there
-  is a single event rate per stratum (exponential failure) or length of
-  the number of rows in `lambda` minus 1, otherwise. The final time
-  period is extended indefinitely for each stratum.
+  specified in rows of `lambda`, `eta` and `etaE`; this is `NULL` if
+  there is a single event rate per stratum (exponential failure) or
+  length of the number of rows in `lambda` minus 1, otherwise. The final
+  time period is extended indefinitely for each stratum.
 
 - T:
 
@@ -205,12 +212,12 @@ print(x, digits = 3, show_gsDesign = FALSE, show_strata = TRUE, ...)
 
 - beta:
 
-  Type II error rate. Default is 0.10 (90% power); NULL if power is to
+  Type II error rate. Default is 0.10 (90% power); `NULL` if power is to
   be computed based on other input values.
 
 - sided:
 
-  1 for 1-sided testing, 2 for 2-sided testing.
+  `1` for 1-sided testing, `2` for 2-sided testing.
 
 - method:
 
@@ -288,16 +295,22 @@ print(x, digits = 3, show_gsDesign = FALSE, show_strata = TRUE, ...)
   `5=`two-sided, asymmetric, lower bound spending under the null
   hypothesis with binding lower bound  
   `6=`two-sided, asymmetric, lower bound spending under the null
-  hypothesis with non-binding lower bound.  
+  hypothesis with non-binding lower bound  
+  `7=`two-sided, asymmetric, with binding futility and binding harm
+  bounds  
+  `8=`two-sided, asymmetric, with non-binding futility and non-binding
+  harm bounds.  
   See details, examples and manual.
 
 - astar:
 
-  Normally not specified. If `test.type=5` or `6`, `astar` specifies the
-  total probability of crossing a lower bound at all analyses combined.
-  This will be changed to \\1 - \\`alpha` when default value of 0 is
-  used. Since this is the expected usage, normally `astar` is not
-  specified by the user.
+  Total spending for the lower (test.type 5 or 6) or harm (test.type 7
+  or 8) bound under the null hypothesis. Default is 0. For `test.type` 5
+  or 6, `astar` specifies the total probability of crossing a lower
+  bound at all analyses combined. For `test.type` 7 or 8, `astar`
+  specifies the total probability of crossing the harm bound at all
+  analyses combined under the null hypothesis. If `astar = 0`, it will
+  be changed to \\1 - \\`alpha`.
 
 - sfu:
 
@@ -316,11 +329,11 @@ print(x, digits = 3, show_gsDesign = FALSE, show_strata = TRUE, ...)
   conservative bound when used with the default Hwang-Shih-DeCani
   spending function. This is a real-vector for many spending functions.
   The parameter `sfupar` specifies any parameters needed for the
-  spending function specified by `sfu`; this will be ignored for
-  spending functions (`sfLDOF`, `sfLDPocock`) or bound types (“OF”,
-  “Pocock”) that do not require parameters. Note that `sfupar` can be
-  specified as a positive scalar for `sfLDOF` for a generalized
-  O'Brien-Fleming spending function.
+  spending function specified by `sfu`; this is not needed for spending
+  functions (`sfLDOF`, `sfLDPocock`) or bound types (“OF”, “Pocock”)
+  that do not require parameters. Note that `sfupar` can be specified as
+  a positive scalar for `sfLDOF` for a generalized O'Brien-Fleming
+  spending function.
 
 - sfl:
 
@@ -339,6 +352,18 @@ print(x, digits = 3, show_gsDesign = FALSE, show_strata = TRUE, ...)
   Hwang-Shih-DeCani spending function, specifies a less conservative
   spending rate than the default for the upper bound.
 
+- sfharm:
+
+  A spending function for the harm bound, used with `test.type = 7` or
+  `test.type = 8`. Default is `sfHSD`. See
+  [`spendingFunction`](https://keaven.github.io/gsDesign/reference/spendingFunction.md)
+  for details.
+
+- sfharmparam:
+
+  Real value, default is \\-2\\. Parameter for the harm bound spending
+  function `sfharm`.
+
 - r:
 
   Integer value (\>= 1 and \<= 80) controlling the number of numerical
@@ -353,13 +378,47 @@ print(x, digits = 3, show_gsDesign = FALSE, show_strata = TRUE, ...)
 
   Default is NULL in which case upper bound spending time is determined
   by `timing`. Otherwise, this should be a vector of length `k` with the
-  spending time at each analysis (see Details in help for `gsDesign`).
+  spending time at each analysis (see Details section of
+  [`gsDesign`](https://keaven.github.io/gsDesign/reference/gsDesign.md)).
 
 - lsTime:
 
   Default is NULL in which case lower bound spending time is determined
   by `timing`. Otherwise, this should be a vector of length `k` with the
-  spending time at each analysis (see Details in help for `gsDesign`).
+  spending time at each analysis (see Details section of
+  [`gsDesign`](https://keaven.github.io/gsDesign/reference/gsDesign.md)).
+
+- testUpper:
+
+  Indicator of which analyses should include an upper (efficacy) bound.
+  A single value of `TRUE` (default) indicates all analyses have an
+  efficacy bound. Otherwise, a logical vector of length `k` indicating
+  which analyses will have an efficacy bound. Overridden to all `TRUE`
+  for `test.type` 1 and 2. Must be `TRUE` at the final analysis to
+  achieve targeted power. At each analysis, at least one of `testUpper`,
+  `testLower`, or `testHarm` must be `TRUE`. Where `testUpper` is
+  `FALSE`, the upper bound is set to `+20` (effectively `Inf`) and
+  displayed as `NA` in output.
+
+- testLower:
+
+  Indicator of which analyses should include a lower (futility) bound. A
+  single value of `TRUE` (default) indicates all analyses have a lower
+  bound; `FALSE` indicates none. Otherwise, a logical vector of length
+  `k`. Ignored for `test.type` 1 (one-sided, no lower bound). Overridden
+  to all `TRUE` for `test.type` 2 (symmetric). For `test.type` 3–8, at
+  least one analysis must be `TRUE`. Where `testLower` is `FALSE`, the
+  lower bound is set to `-20` (effectively `-Inf`) and displayed as `NA`
+  in output.
+
+- testHarm:
+
+  Indicator of which analyses should include a harm bound. A single
+  value of `TRUE` (default) indicates all analyses have a harm bound;
+  `FALSE` indicates none. Otherwise, a logical vector of length `k`.
+  Only used for `test.type` 7 or 8; at least one analysis must be `TRUE`
+  for those types. Where `testHarm` is `FALSE`, the harm bound is set to
+  `-20` (effectively `-Inf`) and displayed as `NA` in output.
 
 - show_gsDesign:
 
@@ -749,6 +808,10 @@ to Follow-Up, Noncompliance, and Stratification. *Biometrics*, 42,
 Schoenfeld D (1981), The Asymptotic Properties of Nonparametric Tests
 for Comparing Survival Distributions. *Biometrika*, 68, 316-319.
 
+Freedman LS (1982), Tables of the Number of Patients Required in
+Clinical Trials Using the Logrank Test. *Statistics in Medicine*, 1,
+121-129.
+
 ## See also
 
 [`uniroot`](https://rdrr.io/r/stats/uniroot.html)
@@ -844,8 +907,8 @@ print(xtable::xtable(x_gs,
   footnote = "This is a footnote; note that it can be wide.",
   caption = "Caption example for xtable output."
 ))
-#> % latex table generated in R 4.5.2 by xtable 1.8-4 package
-#> % Tue Feb 17 19:38:55 2026
+#> % latex table generated in R 4.5.3 by xtable 1.8-8 package
+#> % Mon Mar 23 15:21:13 2026
 #> \begin{table}[ht]
 #> \centering
 #> \begin{tabular}{rllll}

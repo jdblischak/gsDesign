@@ -66,6 +66,8 @@ gsDesign(
   sfupar = -4,
   sfl = sfHSD,
   sflpar = -2,
+  sfharm = sfHSD,
+  sfharmparam = -2,
   tol = 1e-06,
   r = 18,
   n.I = 0,
@@ -76,7 +78,10 @@ gsDesign(
   delta0 = 0,
   overrun = 0,
   usTime = NULL,
-  lsTime = NULL
+  lsTime = NULL,
+  testUpper = TRUE,
+  testLower = TRUE,
+  testHarm = TRUE
 )
 
 # S3 method for class 'gsDesign'
@@ -107,7 +112,11 @@ xtable(
   `5=`two-sided, asymmetric, lower bound spending under the null
   hypothesis with binding lower bound  
   `6=`two-sided, asymmetric, lower bound spending under the null
-  hypothesis with non-binding lower bound.  
+  hypothesis with non-binding lower bound  
+  `7=`two-sided, asymmetric, with binding futility and binding harm
+  bounds  
+  `8=`two-sided, asymmetric, with non-binding futility and non-binding
+  harm bounds.  
   See details, examples and manual.
 
 - alpha:
@@ -120,11 +129,13 @@ xtable(
 
 - astar:
 
-  Normally not specified. If `test.type=5` or `6`, `astar` specifies the
-  total probability of crossing a lower bound at all analyses combined.
-  This will be changed to \\1 - \\`alpha` when default value of 0 is
-  used. Since this is the expected usage, normally `astar` is not
-  specified by the user.
+  Total spending for the lower (test.type 5 or 6) or harm (test.type 7
+  or 8) bound under the null hypothesis. Default is 0. For `test.type` 5
+  or 6, `astar` specifies the total probability of crossing a lower
+  bound at all analyses combined. For `test.type` 7 or 8, `astar`
+  specifies the total probability of crossing the harm bound at all
+  analyses combined under the null hypothesis. If `astar = 0`, it will
+  be changed to \\1 - \\`alpha`.
 
 - delta:
 
@@ -186,6 +197,18 @@ xtable(
   Real value, default is \\-2\\, which, with the default
   Hwang-Shih-DeCani spending function, specifies a less conservative
   spending rate than the default for the upper bound.
+
+- sfharm:
+
+  A spending function for the harm bound, used with `test.type = 7` or
+  `test.type = 8`. Default is `sfHSD`. See
+  [`spendingFunction`](https://keaven.github.io/gsDesign/reference/spendingFunction.md)
+  for details.
+
+- sfharmparam:
+
+  Real value, default is \\-2\\. Parameter for the harm bound spending
+  function `sfharm`.
 
 - tol:
 
@@ -254,13 +277,45 @@ xtable(
 
   Default is NULL in which case upper bound spending time is determined
   by `timing`. Otherwise, this should be a vector of length `k` with the
-  spending time at each analysis (see Details).
+  spending time at each analysis (see Details section of `gsDesign`).
 
 - lsTime:
 
   Default is NULL in which case lower bound spending time is determined
   by `timing`. Otherwise, this should be a vector of length `k` with the
-  spending time at each analysis (see Details).
+  spending time at each analysis (see Details section of `gsDesign`).
+
+- testUpper:
+
+  Indicator of which analyses should include an upper (efficacy) bound.
+  A single value of `TRUE` (default) indicates all analyses have an
+  efficacy bound. Otherwise, a logical vector of length `k` indicating
+  which analyses will have an efficacy bound. Overridden to all `TRUE`
+  for `test.type` 1 and 2. Must be `TRUE` at the final analysis to
+  achieve targeted power. At each analysis, at least one of `testUpper`,
+  `testLower`, or `testHarm` must be `TRUE`. Where `testUpper` is
+  `FALSE`, the upper bound is set to `+20` (effectively `Inf`) and
+  displayed as `NA` in output.
+
+- testLower:
+
+  Indicator of which analyses should include a lower (futility) bound. A
+  single value of `TRUE` (default) indicates all analyses have a lower
+  bound; `FALSE` indicates none. Otherwise, a logical vector of length
+  `k`. Ignored for `test.type` 1 (one-sided, no lower bound). Overridden
+  to all `TRUE` for `test.type` 2 (symmetric). For `test.type` 3–8, at
+  least one analysis must be `TRUE`. Where `testLower` is `FALSE`, the
+  lower bound is set to `-20` (effectively `-Inf`) and displayed as `NA`
+  in output.
+
+- testHarm:
+
+  Indicator of which analyses should include a harm bound. A single
+  value of `TRUE` (default) indicates all analyses have a harm bound;
+  `FALSE` indicates none. Otherwise, a logical vector of length `k`.
+  Only used for `test.type` 7 or 8; at least one analysis must be `TRUE`
+  for those types. Where `testHarm` is `FALSE`, the harm bound is set to
+  `-20` (effectively `-Inf`) and displayed as `NA` in output.
 
 - x:
 
@@ -428,6 +483,21 @@ and upon return from `gsDesign()` contains:
 - lsTime:
 
   As input.
+
+- testUpper:
+
+  Logical vector of length `k` indicating which analyses have an
+  efficacy (upper) bound.
+
+- testLower:
+
+  Logical vector of length `k` indicating which analyses have a futility
+  (lower) bound.
+
+- testHarm:
+
+  Logical vector of length `k` indicating which analyses have a harm
+  bound (only for `test.type` 7 or 8).
 
 - upper:
 

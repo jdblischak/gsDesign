@@ -97,7 +97,7 @@ hypothesis."><meta property="og:image" content="https://keaven.github.io/gsDesig
 
     <a class="navbar-brand me-2" href="../index.html">gsDesign</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.9.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.9.0.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -184,6 +184,8 @@ hypothesis.</p>
 <span>  sfupar <span class="op">=</span> <span class="op">-</span><span class="fl">4</span>,</span>
 <span>  sfl <span class="op">=</span> <span class="va">sfHSD</span>,</span>
 <span>  sflpar <span class="op">=</span> <span class="op">-</span><span class="fl">2</span>,</span>
+<span>  sfharm <span class="op">=</span> <span class="va">sfHSD</span>,</span>
+<span>  sfharmparam <span class="op">=</span> <span class="op">-</span><span class="fl">2</span>,</span>
 <span>  tol <span class="op">=</span> <span class="fl">1e-06</span>,</span>
 <span>  r <span class="op">=</span> <span class="fl">18</span>,</span>
 <span>  n.I <span class="op">=</span> <span class="fl">0</span>,</span>
@@ -194,7 +196,10 @@ hypothesis.</p>
 <span>  delta0 <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  overrun <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  usTime <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  lsTime <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  lsTime <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  testUpper <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  testLower <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  testHarm <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'gsDesign'</span></span>
@@ -221,7 +226,9 @@ hypothesis.</p>
 <dd><p><code>1=</code>one-sided <br><code>2=</code>two-sided symmetric <br><code>3=</code>two-sided, asymmetric, beta-spending with binding lower bound <br><code>4=</code>two-sided, asymmetric, beta-spending with non-binding lower bound
 <br><code>5=</code>two-sided, asymmetric, lower bound spending under the null
 hypothesis with binding lower bound <br><code>6=</code>two-sided, asymmetric,
-lower bound spending under the null hypothesis with non-binding lower bound.
+lower bound spending under the null hypothesis with non-binding lower bound
+<br><code>7=</code>two-sided, asymmetric, with binding futility and binding harm bounds
+<br><code>8=</code>two-sided, asymmetric, with non-binding futility and non-binding harm bounds.
 <br> See details, examples and manual.</p></dd>
 
 
@@ -234,11 +241,13 @@ lower bound spending under the null hypothesis with non-binding lower bound.
 
 
 <dt id="arg-astar">astar<a class="anchor" aria-label="anchor" href="#arg-astar"></a></dt>
-<dd><p>Normally not specified. If <code>test.type=5</code> or <code>6</code>,
-<code>astar</code> specifies the total probability of crossing a lower bound at
-all analyses combined.  This will be changed to \(1 - \)<code>alpha</code> when
-default value of 0 is used.  Since this is the expected usage, normally
-<code>astar</code> is not specified by the user.</p></dd>
+<dd><p>Total spending for the lower (test.type 5 or 6) or harm
+(test.type 7 or 8) bound under the null hypothesis. Default is 0.
+For <code>test.type</code> 5 or 6, <code>astar</code> specifies the total probability
+of crossing a lower bound at all analyses combined.
+For <code>test.type</code> 7 or 8, <code>astar</code> specifies the total probability
+of crossing the harm bound at all analyses combined under the null hypothesis.
+If <code>astar = 0</code>, it will be changed to \(1 - \)<code>alpha</code>.</p></dd>
 
 
 <dt id="arg-delta">delta<a class="anchor" aria-label="anchor" href="#arg-delta"></a></dt>
@@ -299,6 +308,17 @@ details, spending functions, manual and examples.</p></dd>
 <dd><p>Real value, default is \(-2\), which, with the default
 Hwang-Shih-DeCani spending function, specifies a less conservative spending
 rate than the default for the upper bound.</p></dd>
+
+
+<dt id="arg-sfharm">sfharm<a class="anchor" aria-label="anchor" href="#arg-sfharm"></a></dt>
+<dd><p>A spending function for the harm bound, used with
+<code>test.type = 7</code> or <code>test.type = 8</code>.
+Default is <code>sfHSD</code>. See <code><a href="spendingFunction.html">spendingFunction</a></code> for details.</p></dd>
+
+
+<dt id="arg-sfharmparam">sfharmparam<a class="anchor" aria-label="anchor" href="#arg-sfharmparam"></a></dt>
+<dd><p>Real value, default is \(-2\). Parameter for the harm
+bound spending function <code>sfharm</code>.</p></dd>
 
 
 <dt id="arg-tol">tol<a class="anchor" aria-label="anchor" href="#arg-tol"></a></dt>
@@ -365,13 +385,54 @@ that are not included in each interim analysis.</p></dd>
 <dt id="arg-ustime">usTime<a class="anchor" aria-label="anchor" href="#arg-ustime"></a></dt>
 <dd><p>Default is NULL in which case upper bound spending time is
 determined by <code>timing</code>. Otherwise, this should be a vector of length
-<code>k</code> with the spending time at each analysis (see Details).</p></dd>
+<code>k</code> with the spending time at each analysis
+(see Details section of <code>gsDesign</code>).</p></dd>
 
 
 <dt id="arg-lstime">lsTime<a class="anchor" aria-label="anchor" href="#arg-lstime"></a></dt>
 <dd><p>Default is NULL in which case lower bound spending time is
 determined by <code>timing</code>. Otherwise, this should be a vector of length
-<code>k</code> with the spending time at each analysis (see Details).</p></dd>
+<code>k</code> with the spending time at each analysis
+(see Details section of <code>gsDesign</code>).</p></dd>
+
+
+<dt id="arg-testupper">testUpper<a class="anchor" aria-label="anchor" href="#arg-testupper"></a></dt>
+<dd><p>Indicator of which analyses should include an upper
+(efficacy) bound.
+A single value of <code>TRUE</code> (default) indicates all analyses have an
+efficacy bound.
+Otherwise, a logical vector of length <code>k</code> indicating which analyses
+will have an efficacy bound.
+Overridden to all <code>TRUE</code> for <code>test.type</code> 1 and 2.
+Must be <code>TRUE</code> at the final analysis to achieve targeted power.
+At each analysis, at least one of <code>testUpper</code>, <code>testLower</code>, or
+<code>testHarm</code> must be <code>TRUE</code>.
+Where <code>testUpper</code> is <code>FALSE</code>, the upper bound is set to
+<code>+20</code> (effectively <code>Inf</code>) and displayed as <code>NA</code> in output.</p></dd>
+
+
+<dt id="arg-testlower">testLower<a class="anchor" aria-label="anchor" href="#arg-testlower"></a></dt>
+<dd><p>Indicator of which analyses should include a lower
+(futility) bound.
+A single value of <code>TRUE</code> (default) indicates all analyses have a
+lower bound; <code>FALSE</code> indicates none.
+Otherwise, a logical vector of length <code>k</code>.
+Ignored for <code>test.type</code> 1 (one-sided, no lower bound).
+Overridden to all <code>TRUE</code> for <code>test.type</code> 2 (symmetric).
+For <code>test.type</code> 3–8, at least one analysis must be <code>TRUE</code>.
+Where <code>testLower</code> is <code>FALSE</code>, the lower bound is set to
+<code>-20</code> (effectively <code>-Inf</code>) and displayed as <code>NA</code> in output.</p></dd>
+
+
+<dt id="arg-testharm">testHarm<a class="anchor" aria-label="anchor" href="#arg-testharm"></a></dt>
+<dd><p>Indicator of which analyses should include a harm bound.
+A single value of <code>TRUE</code> (default) indicates all analyses have a
+harm bound; <code>FALSE</code> indicates none.
+Otherwise, a logical vector of length <code>k</code>.
+Only used for <code>test.type</code> 7 or 8; at least one analysis must be
+<code>TRUE</code> for those types.
+Where <code>testHarm</code> is <code>FALSE</code>, the harm bound is set to
+<code>-20</code> (effectively <code>-Inf</code>) and displayed as <code>NA</code> in output.</p></dd>
 
 
 <dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
@@ -516,7 +577,20 @@ size, this is not needed and a more complete output summary is given.</p></dd>
 <dd><p>As input.</p></dd>
  <dt>lsTime</dt>
 <dd><p>As input.</p></dd>
- <dt>upper</dt>
+
+<dt>testUpper</dt>
+<dd><p>Logical vector of length <code>k</code> indicating which
+analyses have an efficacy (upper) bound.</p></dd>
+
+<dt>testLower</dt>
+<dd><p>Logical vector of length <code>k</code> indicating which
+analyses have a futility (lower) bound.</p></dd>
+
+<dt>testHarm</dt>
+<dd><p>Logical vector of length <code>k</code> indicating which
+analyses have a harm bound (only for <code>test.type</code> 7 or 8).</p></dd>
+
+<dt>upper</dt>
 <dd><p>Upper bound spending function,
 boundary and boundary crossing probabilities under the NULL and alternate
 hypotheses. See <code><a href="../articles/SpendingFunctionOverview.html">vignette("SpendingFunctionOverview")</a></code> and manual for further
