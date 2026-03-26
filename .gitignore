@@ -12,6 +12,8 @@ TODO
 *.pdf
 *.html
 *.rnw
+Meta/
+doc/
 docs/
 /*.tar.gz
 /*.Rcheck/
