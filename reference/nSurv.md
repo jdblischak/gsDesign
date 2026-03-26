@@ -864,6 +864,7 @@ x_gs <- gsSurv(
 )
 print(x_gs)
 #> Group sequential design (method=LachinFoulkes; k=4 analyses; Two-sided asymmetric with non-binding futility)
+#> HR=0.500 vs HR0=1.000 | alpha=0.025 (sided=2) | power=90.0%
 #> N=140.7 subjects | D=114.8 events | T=36.0 study duration | accrual=24.0 Accrual duration | minfup=12.0 minimum follow-up | ratio=1 randomization ratio (experimental/control)
 #> 
 #> Spending functions:
@@ -908,7 +909,7 @@ print(xtable::xtable(x_gs,
   caption = "Caption example for xtable output."
 ))
 #> % latex table generated in R 4.5.3 by xtable 1.8-8 package
-#> % Mon Mar 23 15:21:13 2026
+#> % Thu Mar 26 15:59:29 2026
 #> \begin{table}[ht]
 #> \centering
 #> \begin{tabular}{rllll}
@@ -992,6 +993,7 @@ gsSurv(
 ) |>
   print()
 #> Group sequential design (method=Schoenfeld; k=4 analyses; Two-sided asymmetric with non-binding futility)
+#> HR=0.500 vs HR0=1.000 | alpha=0.025 (sided=2) | power=90.0%
 #> N=142.9 subjects | D=116.6 events | T=36.0 study duration | accrual=24.0 Accrual duration | minfup=12.0 minimum follow-up | ratio=1 randomization ratio (experimental/control)
 #> 
 #> Spending functions:
@@ -1063,6 +1065,7 @@ gsSurv(
 ) |>
   print()
 #> Group sequential design (method=Freedman; k=4 analyses; Two-sided asymmetric with non-binding futility)
+#> HR=0.500 vs HR0=1.000 | alpha=0.025 (sided=2) | power=90.0%
 #> N=154.5 subjects | D=126.1 events | T=36.0 study duration | accrual=24.0 Accrual duration | minfup=12.0 minimum follow-up | ratio=1 randomization ratio (experimental/control)
 #> 
 #> Spending functions:
@@ -1148,6 +1151,7 @@ gsSurv(
 ) |>
   print()
 #> Group sequential design (method=LachinFoulkes; k=4 analyses; Two-sided asymmetric with non-binding futility)
+#> HR=0.500 vs HR0=1.000 | alpha=0.025 (sided=2) | power=90.0%
 #> N=1451.2 subjects | D=121.4 events | T=5.0 study duration | accrual=2.0 Accrual duration | minfup=3.0 minimum follow-up | ratio=1 randomization ratio (experimental/control)
 #> 
 #> Spending functions:
@@ -1236,6 +1240,7 @@ gsSurv(
 ) |>
   print()
 #> Group sequential design (method=BernsteinLagakos; k=4 analyses; Two-sided asymmetric with non-binding futility)
+#> HR=0.500 vs HR0=1.000 | alpha=0.025 (sided=2) | power=90.0%
 #> N=302.4 subjects | D=104.9 events | T=18.0 study duration | accrual=6.0 Accrual duration | minfup=12.0 minimum follow-up | ratio=1 randomization ratio (experimental/control)
 #> 
 #> Spending functions:
