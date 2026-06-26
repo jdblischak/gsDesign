@@ -331,6 +331,7 @@ Keaven Anderson <keaven_anderson@merck.com>
 ## Examples
 
 ``` r
+
 # Compute z-test test statistic comparing 39/500 to 13/500
 # use continuity correction in variance
 x <- testBinomial(x1 = 39, x2 = 13, n1 = 500, n2 = 500, adj = 1)
@@ -351,10 +352,10 @@ pnorm(x0, lower.tail = FALSE)
 # (you may want to perform more to reduce standard error of estimate)
 sum(as.double(x0) <=
   simBinomial(p1 = .078, p2 = .078, n1 = 500, n2 = 500, nsim = 10000)) / 10000
-#> [1] 0.0171
+#> [1] 0.0172
 sum(as.double(x0) <=
   simBinomial(p1 = .052, p2 = .052, n1 = 500, n2 = 500, nsim = 10000)) / 10000
-#> [1] 0.0185
+#> [1] 0.0196
 
 # Perform a non-inferiority test to see if p2=400 / 500 is within 5% of
 # p1=410 / 500 use a z-statistic with unadjusted variance
@@ -376,7 +377,7 @@ pchisq(testBinomial(
 # now simulate the z-statistic witthout continuity corrected variance
 sum(qnorm(.975) <=
   simBinomial(p1 = .8, p2 = .8, n1 = 500, n2 = 500, nsim = 100000)) / 100000
-#> [1] 0.02465
+#> [1] 0.02449
 
 # compute a sample size to show non-inferiority
 # with 5% margin, 90% power
@@ -442,11 +443,11 @@ x1 <- rbinom(n = 1, size = 100, p = .2)
 x2 <- rbinom(n = 1, size = 200, p = .1)
 # blinded estimate of risk difference variance
 varBinomial(x = x1 + x2, n = 300, ratio = 2, delta0 = 0)
-#> [1] 0.001841833
+#> [1] 0.001769833
 # blinded estimate of log-risk-ratio variance
 varBinomial(x = x1 + x2, n = 300, ratio = 2, delta0 = 0, scale = "RR")
-#> [1] 0.08965116
+#> [1] 0.0947561
 # blinded estimate of log-odds-ratio variance
 varBinomial(x = x1 + x2, n = 300, ratio = 2, delta0 = 0, scale = "OR")
-#> [1] 0.1221609
+#> [1] 0.1271306
 ```

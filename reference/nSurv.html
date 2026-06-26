@@ -5,7 +5,7 @@
       fontURL: "https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/output/chtml/fonts/woff-v2"
     }
   };
-</script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet"><link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet"><script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Advanced time-to-event sample size calculation — tEventsIA"><meta name="description" content="nSurv() is used to calculate the sample size for a two-arm clinical trial
+</script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet"><link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet"><script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Advanced time-to-event sample size calculation — tEventsIA"><meta name="description" content="nSurv() is used to calculate the sample size for a two-arm clinical trial
 with a time-to-event endpoint under the assumption of proportional hazards.
 The default method assumes a fixed enrollment duration and fixed trial duration;
 in this case the required sample size is achieved by increasing enrollment rates.
@@ -29,7 +29,7 @@ group sequential design for a study with a time-to-event endpoint."><meta proper
 
     <a class="navbar-brand me-2" href="../index.html">gsDesign</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.9.0.9003</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.10.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -755,9 +755,9 @@ Foulkes (1986) methods assuming a constant hazard difference or exponential
 enrollment rate.</p>
 <p>When study duration (<code>T</code>) and follow-up duration (<code>minfup</code>) are
 fixed, <code>nSurv</code> applies exactly the Lachin and Foulkes (1986) method of
-computing sample size under the proportional hazards assumption when For
-this computation, enrollment rates are altered proportionately to those
-input in <code>gamma</code> to achieve the power of interest.</p>
+computing sample size under the proportional hazards assumption. For this
+computation, enrollment rates are altered proportionately to those input in
+<code>gamma</code> to achieve the power of interest.</p>
 <p>Given the specified enrollment rate(s) input in <code>gamma</code>, <code>nSurv</code>
 may also be used to derive enrollment duration required for a trial to have
 defined power if <code>T</code> is input as <code>NULL</code>; in this case, both
@@ -770,9 +770,19 @@ enrollment duration(s) specified in <code>R</code> are considered fixed and
 method will fail if the specified enrollment rates and durations either
 over-powers the trial with no additional follow-up or underpowers the trial
 with infinite follow-up. This method produces a corresponding error message
-in such cases.</p>
+in such cases. For methods other than Lachin and Foulkes, these fixed-rate
+duration solves use the selected method for the fixed-design event
+calculation.</p>
 <p>The input to <code>gsSurv</code> is a combination of the input to <code>nSurv()</code>
-and <code><a href="gsDesign.html">gsDesign()</a></code>.</p>
+and <code><a href="gsDesign.html">gsDesign()</a></code>.
+When <code>T = NULL</code> and <code>minfup</code> is specified, <code>gsSurv()</code>
+preserves the input accrual rate and minimum follow-up, applies the group
+sequential design, and solves the accrual duration needed for the final
+planned number of events.
+When both <code>T</code> and <code>minfup</code> are <code>NULL</code>, <code>gsSurv()</code>
+preserves the input accrual rate and duration, applies the group sequential
+design, and solves the follow-up duration needed for the final planned
+number of events.</p>
 <p><code>nEventsIA()</code> is provided to compute the expected number of events at a
 given point in time given enrollment, event and censoring rates. The routine
 is used with a root finding routine to approximate the approximate timing of
@@ -796,10 +806,15 @@ Trials Using the Logrank Test. <em>Statistics in Medicine</em>, 1, 121-129.</p>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="https://rdrr.io/r/stats/uniroot.html" class="external-link">uniroot</a></code></p>
+<p><code><a href="../articles/gsSurvBasicExamples.html">vignette("gsSurvBasicExamples", package = "gsDesign")</a></code> for
+  basic survival sample size examples, <code><a href="../articles/SurvivalOverview.html">vignette("SurvivalOverview",
+  package = "gsDesign")</a></code> for method background, and
+  <code><a href="../articles/SeqDesignSurvival.html">vignette("SeqDesignSurvival", package = "gsDesign")</a></code> for a SAS PROC
+  SEQDESIGN translation example.</p>
 <p><code><a href="gsBoundSummary.html">gsBoundSummary</a></code>, <code><a href="gsBoundSummary.html">xprint</a></code>,
-  <code><a href="gsSurvCalendar.html">gsSurvCalendar</a></code>, <a href="gsDesign-package.html">gsDesign-package</a>,
-  <a href="plot.gsDesign.html">plot.gsDesign</a>, <code><a href="gsDesign.html">gsDesign</a></code>, <code><a href="gsBoundSummary.html">gsHR</a></code>,
-  <code><a href="nSurvival.html">nSurvival</a></code></p>
+  <code><a href="gsSurvCalendar.html">gsSurvCalendar</a></code>, <code><a href="gsSurvPower.html">gsSurvPower</a></code>,
+  <a href="gsDesign-package.html">gsDesign-package</a>, <a href="plot.gsDesign.html">plot.gsDesign</a>, <code><a href="gsDesign.html">gsDesign</a></code>,
+  <code><a href="gsBoundSummary.html">gsHR</a></code>, <code><a href="nSurvival.html">nSurvival</a></code></p>
 <p><code><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">Normal</a></code>
  <code><a href="https://rdrr.io/pkg/xtable/man/xtable.html" class="external-link">xtable</a></code></p></div>
     </div>
@@ -884,8 +899,8 @@ Trials Using the Logrank Test. <em>Statistics in Medicine</em>, 1, 121-129.</p>
 <span class="r-in"><span>  footnote <span class="op">=</span> <span class="st">"This is a footnote; note that it can be wide."</span>,</span></span>
 <span class="r-in"><span>  caption <span class="op">=</span> <span class="st">"Caption example for xtable output."</span></span></span>
 <span class="r-in"><span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> % latex table generated in R 4.5.3 by xtable 1.8-8 package</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> % Thu Mar 26 15:59:29 2026</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> % latex table generated in R 4.6.1 by xtable 1.8-8 package</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> % Fri Jun 26 18:10:55 2026</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> \begin{table}[ht]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> \centering</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> \begin{tabular}{rllll}</span>
@@ -951,12 +966,12 @@ Trials Using the Logrank Test. <em>Statistics in Medicine</em>, 1, 121-129.</p>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> nSurv fixed-design summary (method=Schoenfeld; target=Accrual duration)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> HR=0.500 vs HR0=1.000 | alpha=0.025 (sided=1) | power=90.0%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> N=109.5 subjects | D=86.2 events | T=30.2 study duration | accrual=18.2 Accrual duration | minfup=12.0 minimum follow-up | ratio=1 randomization ratio (experimental/control)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> N=110.9 subjects | D=87.5 events | T=30.5 study duration | accrual=18.5 Accrual duration | minfup=12.0 minimum follow-up | ratio=1 randomization ratio (experimental/control)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Key inputs (names preserved):</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                desc    item  value input</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                     Accrual rate(s)   gamma      6     6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            Accrual rate duration(s)       R 18.243    12</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            Accrual rate duration(s)       R 18.483    12</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>              Control hazard rate(s) lambdaC  0.116 0.116</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>             Control dropout rate(s)     eta  0.001 0.001</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        Experimental dropout rate(s)    etaE  0.001  etaE</span>
@@ -1023,7 +1038,7 @@ Trials Using the Logrank Test. <em>Statistics in Medicine</em>, 1, 121-129.</p>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> nSurv fixed-design summary (method=Freedman; target=Follow-up duration)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> HR=0.500 vs HR0=1.000 | alpha=0.025 (sided=1) | power=90.0%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> N=150.0 subjects | D=86.8 events | T=25.3 study duration | accrual=25.0 Accrual duration | minfup=0.3 minimum follow-up | ratio=1 randomization ratio (experimental/control)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> N=150.0 subjects | D=94.6 events | T=27.0 study duration | accrual=25.0 Accrual duration | minfup=2.0 minimum follow-up | ratio=1 randomization ratio (experimental/control)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Key inputs (names preserved):</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                desc    item value input</span>
@@ -1179,22 +1194,22 @@ Trials Using the Logrank Test. <em>Statistics in Medicine</em>, 1, 121-129.</p>
 <span class="r-in"><span><span class="fu">nSurv</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  lambdaC <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">6</span>, <span class="fl">12</span>, <span class="fl">18</span>, <span class="fl">24</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>, hr <span class="op">=</span> <span class="fl">.5</span>,</span></span>
 <span class="r-in"><span>  eta <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">40</span>, <span class="fl">50</span>, <span class="fl">45</span>, <span class="fl">55</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>, S <span class="op">=</span> <span class="fl">3</span>,</span></span>
-<span class="r-in"><span>  gamma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">6</span>, <span class="fl">5</span>, <span class="fl">7</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>, R <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">10</span><span class="op">)</span>, minfup <span class="op">=</span> <span class="fl">12</span>,</span></span>
+<span class="r-in"><span>  gamma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">6</span>, <span class="fl">5</span>, <span class="fl">7</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>, R <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">10</span><span class="op">)</span>, T <span class="op">=</span> <span class="fl">27</span>, minfup <span class="op">=</span> <span class="fl">12</span>,</span></span>
 <span class="r-in"><span>  alpha <span class="op">=</span> <span class="fl">.025</span>, beta <span class="op">=</span> <span class="fl">.1</span>, method <span class="op">=</span> <span class="st">"BernsteinLagakos"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> nSurv fixed-design summary (method=BernsteinLagakos; target=Accrual rate)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> HR=0.500 vs HR0=1.000 | alpha=0.025 (sided=1) | power=90.0%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> N=226.8 subjects | D=78.7 events | T=18.0 study duration | accrual=6.0 Accrual duration | minfup=12.0 minimum follow-up | ratio=1 randomization ratio (experimental/control)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> N=196.0 subjects | D=79.0 events | T=27.0 study duration | accrual=15.0 Accrual duration | minfup=12.0 minimum follow-up | ratio=1 randomization ratio (experimental/control)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Expected events by stratum (H1):</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   control experimental  total</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  26.517       16.431 42.949</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  22.980       12.761 35.741</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  27.731       17.827 45.558</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  21.299       12.137 33.435</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Key inputs (names preserved):</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                desc    item                           value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                     Accrual rate(s)   gamma  12.84, 25.68, 21.4 ... (len=4)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            Accrual rate duration(s)       R                            5, 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                     Accrual rate(s)   gamma 3.458, 6.916, 5.763 ... (len=4)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            Accrual rate duration(s)       R                           5, 10</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>              Control hazard rate(s) lambdaC 0.116, 0.058, 0.039 ... (len=4)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>             Control dropout rate(s)     eta 0.017, 0.014, 0.015 ... (len=4)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        Experimental dropout rate(s)    etaE 0.017, 0.014, 0.015 ... (len=4)</span>
@@ -1211,13 +1226,13 @@ Trials Using the Logrank Test. <em>Statistics in Medicine</em>, 1, 121-129.</p>
 <span class="r-in"><span>  k <span class="op">=</span> <span class="fl">4</span>, sfu <span class="op">=</span> <span class="fu">gsDesign</span><span class="fu">::</span><span class="va"><a href="sfHSD.html">sfHSD</a></span>, sfupar <span class="op">=</span> <span class="op">-</span><span class="fl">4</span>, sfl <span class="op">=</span> <span class="fu">gsDesign</span><span class="fu">::</span><span class="va"><a href="sfPower.html">sfPower</a></span>, sflpar <span class="op">=</span> <span class="fl">.5</span>,</span></span>
 <span class="r-in"><span>  lambdaC <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">6</span>, <span class="fl">12</span>, <span class="fl">18</span>, <span class="fl">24</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>, hr <span class="op">=</span> <span class="fl">.5</span>,</span></span>
 <span class="r-in"><span>  eta <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">40</span>, <span class="fl">50</span>, <span class="fl">45</span>, <span class="fl">55</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>, S <span class="op">=</span> <span class="fl">3</span>,</span></span>
-<span class="r-in"><span>  gamma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">6</span>, <span class="fl">5</span>, <span class="fl">7</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>, R <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">10</span><span class="op">)</span>, minfup <span class="op">=</span> <span class="fl">12</span>,</span></span>
+<span class="r-in"><span>  gamma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">6</span>, <span class="fl">5</span>, <span class="fl">7</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>, R <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">10</span><span class="op">)</span>, T <span class="op">=</span> <span class="fl">27</span>, minfup <span class="op">=</span> <span class="fl">12</span>,</span></span>
 <span class="r-in"><span>  alpha <span class="op">=</span> <span class="fl">.025</span>, beta <span class="op">=</span> <span class="fl">.1</span>, method <span class="op">=</span> <span class="st">"BernsteinLagakos"</span></span></span>
 <span class="r-in"><span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Group sequential design (method=BernsteinLagakos; k=4 analyses; Two-sided asymmetric with non-binding futility)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> HR=0.500 vs HR0=1.000 | alpha=0.025 (sided=2) | power=90.0%</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> N=302.4 subjects | D=104.9 events | T=18.0 study duration | accrual=6.0 Accrual duration | minfup=12.0 minimum follow-up | ratio=1 randomization ratio (experimental/control)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> N=261.2 subjects | D=105.3 events | T=27.0 study duration | accrual=15.0 Accrual duration | minfup=12.0 minimum follow-up | ratio=1 randomization ratio (experimental/control)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Spending functions:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   Efficacy bounds derived using a Hwang-Shih-DeCani spending function with gamma = -4.</span>
@@ -1227,34 +1242,34 @@ Trials Using the Logrank Test. <em>Statistics in Medicine</em>, 1, 121-129.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Method: BernsteinLagakos </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     Analysis              Value Efficacy Futility</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    IA 1: 25%                  Z   3.1554   0.2264</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       N: 250        p (1-sided)   0.0008   0.4105</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Events: 27       ~HR at bound   0.2916   0.9154</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     Month: 5   P(Cross) if HR=1   0.0008   0.5895</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       N: 166        p (1-sided)   0.0008   0.4105</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Events: 27       ~HR at bound   0.2923   0.9155</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    Month: 10   P(Cross) if HR=1   0.0008   0.5895</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>              P(Cross) if HR=0.5   0.0995   0.0500</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    IA 2: 50%                  Z   2.8183   0.8619</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       N: 304        p (1-sided)   0.0024   0.1944</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Events: 53       ~HR at bound   0.4592   0.7882</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     Month: 8   P(Cross) if HR=1   0.0030   0.8366</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       N: 256        p (1-sided)   0.0024   0.1944</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Events: 53       ~HR at bound   0.4598   0.7885</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    Month: 15   P(Cross) if HR=1   0.0030   0.8366</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>              P(Cross) if HR=0.5   0.4388   0.0707</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    IA 3: 75%                  Z   2.4390   1.4589</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       N: 304        p (1-sided)   0.0074   0.0723</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Events: 79       ~HR at bound   0.5770   0.7197</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Month: 12   P(Cross) if HR=1   0.0085   0.9445</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       N: 262        p (1-sided)   0.0074   0.0723</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Events: 79       ~HR at bound   0.5776   0.7201</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    Month: 20   P(Cross) if HR=1   0.0085   0.9445</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>              P(Cross) if HR=0.5   0.7776   0.0866</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        Final                  Z   2.0136   2.0136</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       N: 304        p (1-sided)   0.0220   0.0220</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Events: 105       ~HR at bound   0.6749   0.6749</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Month: 18   P(Cross) if HR=1   0.0187   0.9813</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       N: 262        p (1-sided)   0.0220   0.0220</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Events: 106       ~HR at bound   0.6754   0.6754</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    Month: 27   P(Cross) if HR=1   0.0187   0.9813</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>              P(Cross) if HR=0.5   0.9000   0.1000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Key inputs (names preserved):</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                desc    item                             value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                     Accrual rate(s)   gamma 17.115, 28.525, 34.23 ... (len=4)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>            Accrual rate duration(s)       R                              5, 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              Control hazard rate(s) lambdaC   0.116, 0.039, 0.058 ... (len=4)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             Control dropout rate(s)     eta   0.017, 0.015, 0.014 ... (len=4)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        Experimental dropout rate(s)    etaE   0.017, 0.015, 0.014 ... (len=4)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Event and dropout rate duration(s)       S                                 3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                desc    item                           value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                     Accrual rate(s)   gamma 4.609, 7.682, 9.218 ... (len=4)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            Accrual rate duration(s)       R                           5, 10</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              Control hazard rate(s) lambdaC 0.116, 0.039, 0.058 ... (len=4)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             Control dropout rate(s)     eta 0.017, 0.015, 0.014 ... (len=4)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        Experimental dropout rate(s)    etaE 0.017, 0.015, 0.014 ... (len=4)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Event and dropout rate duration(s)       S                               3</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                            input</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>              3, 5, 6 ... (len=4)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                            5, 10</span>
@@ -1265,8 +1280,8 @@ Trials Using the Logrank Test. <em>Statistics in Medicine</em>, 1, 121-129.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Expected events by stratum (H1) at final analysis:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    stratum control experimental  total</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Stratum 1  35.346       21.902 57.248</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Stratum 2  30.631       17.010 47.641</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Stratum 1  36.963       23.762 60.725</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Stratum 2  28.390       16.177 44.567</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example to compute power for a fixed design.</span></span></span>
 <span class="r-in"><span><span class="co"># Trial duration T, minimum follow-up minfup and accrual duration R are all</span></span></span>

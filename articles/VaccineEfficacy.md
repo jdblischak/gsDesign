@@ -1,6 +1,7 @@
 # Vaccine efficacy trial design
 
 ``` r
+
 library(gsDesign)
 library(gt)
 ```
@@ -18,6 +19,9 @@ size required. This vignette also illustrates the concept of
 super-superiority often used in prevention studies. Finally, since this
 procedure is new as of November, 2023 we suggest checks and potential
 revisions to spending function choices to optimize design boundaries.
+For an extension to annual seasonal monitoring with blinded
+information-adaptive enrollment, see
+[`vignette("MultiSeasonRareEvents", package = "gsDesign")`](https://keaven.github.io/gsDesign/articles/MultiSeasonRareEvents.md).
 
 ## Parameterization
 
@@ -54,6 +58,7 @@ ratio \\r=3\\. This converts to an alternate hypothesis (approximate)
 probability that any event is in the experimental group of
 
 ``` r
+
 pi1 <- .7
 ratio <- 3
 p1 <- ratio / (ratio + 1 / (1 - pi1))
@@ -65,6 +70,7 @@ p1
 We use the inversion formula to revert this to \\\pi_1 = 0.7\\
 
 ``` r
+
 1 - 1 / (ratio * (1 / p1 - 1))
 ```
 
@@ -75,6 +81,7 @@ exact binomial null hypothesis probability that an event is in the
 experimental group is
 
 ``` r
+
 pi0 <- .3
 p0 <- ratio / (ratio + 1 / (1 - pi0))
 p0
@@ -86,6 +93,7 @@ We also translate several vaccine efficacy values to proportion of
 events in the experimental group:
 
 ``` r
+
 ve <- c(.5, .6, .65, .7, .75, .8)
 prob_experimental <- ratio / (ratio + 1 / (1 - ve))
 tibble::tibble(VE = ve, "P(Experimental)" = prob_experimental) |>
@@ -137,6 +145,7 @@ randomization ratio (experimental/control) was assumed to be 3:1 as in
 the Logunov et al. (2021) trial.
 
 ``` r
+
 alpha <- 0.025 # Type I error
 beta <- 0.1 # Type II error (1 - power)
 k <- 3 # number of analyses in group sequential design
@@ -163,6 +172,7 @@ requirements, adjust parameters above until a satisfactory result is
 obtained.
 
 ``` r
+
 # Derive Group Sequential Design
 # This determines final sample size
 x <- gsSurv(
@@ -177,25 +187,25 @@ x <- gsSurv(
 ```
 
 Now we convert this to a design with integer event counts at analyses.
-This is achieved by rounding interim analysis event counts from the
-above design and rounding up the final analysis event count. This will
-result in a slight change in event fractions at interim analyses as well
-as a slight change from the targeted 90% power. We now explain the
-rationale behind the spending function choices. Recall that the hazard
-ratio (HR) is 1 minus the VE. The `~HR at bound` represents the
-approximate hazard ratio required to cross a bound. Thus, small HR’s at
-the interim analyses along with small cumulative \\\alpha\\-spending
-suggest crossing an interim efficacy bound would provide a result strong
-enough to potentially justify the new treatment. The hazard ratio of
-~0.69 (VE ~ 0.31) for the interim 1 futility bound mean that the
-efficacy trend would be essentially no better than the null hypothesis
-if the futility bound were crossed. The second analysis futility bound
-with approximate VE of 0.5 would be worth discussion with a data
-monitoring committee as well as other planners for the trial; a custom
-spending function could be used to set both the first and second interim
-bounds to desired levels.
+This is achieved by rounding event counts down and rounding total sample
+size to an integer allocation. This will result in a slight change in
+event fractions at interim analyses as well as a slight change from the
+targeted 90% power. We now explain the rationale behind the spending
+function choices. Recall that the hazard ratio (HR) is 1 minus the VE.
+The `~HR at bound` represents the approximate hazard ratio required to
+cross a bound. Thus, small HR’s at the interim analyses along with small
+cumulative \\\alpha\\-spending suggest crossing an interim efficacy
+bound would provide a result strong enough to potentially justify the
+new treatment. The hazard ratio of ~0.69 (VE ~ 0.31) for the interim 1
+futility bound mean that the efficacy trend would be essentially no
+better than the null hypothesis if the futility bound were crossed. The
+second analysis futility bound with approximate VE of 0.5 would be worth
+discussion with a data monitoring committee as well as other planners
+for the trial; a custom spending function could be used to set both the
+first and second interim bounds to desired levels.
 
 ``` r
+
 xx <- toInteger(x)
 gsBoundSummary(xx,
   tdigits = 1, logdelta = TRUE, deltaname = "HR", Nname = "Events",
@@ -213,38 +223,39 @@ gsBoundSummary(xx,
 |----------------------------------------|--------------------|----------|----------|
 | Integer event counts at analyses       |                    |          |          |
 | Analysis                               | Value              | Efficacy | Futility |
-| IA 1: 44%                              | Z                  | 2.6864   | 0.0424   |
-| Events: 3604                           | p (1-sided)        | 0.0036   | 0.4831   |
-| Events: 30                             | ~HR at bound       | 0.2255   | 0.6876   |
-| Month: 12.8                            | Spending           | 0.0036   | 0.0144   |
-|                                        | P(Cross) if HR=0.7 | 0.0036   | 0.5169   |
-|                                        | P(Cross) if HR=0.3 | 0.3231   | 0.0144   |
-| IA 2: 69%                              | Z                  | 2.4494   | 0.9143   |
-| Events: 3604                           | p (1-sided)        | 0.0072   | 0.1803   |
-| Events: 47                             | ~HR at bound       | 0.3067   | 0.5144   |
-| Month: 17.9                            | Spending           | 0.0055   | 0.0220   |
-|                                        | P(Cross) if HR=0.7 | 0.0091   | 0.8287   |
-|                                        | P(Cross) if HR=0.3 | 0.6455   | 0.0364   |
-| Final                                  | Z                  | 2.0296   | 2.0296   |
-| Events: 3604                           | p (1-sided)        | 0.0212   | 0.0212   |
-| Events: 68                             | ~HR at bound       | 0.3965   | 0.3965   |
-| Month: 24.2                            | Spending           | 0.0159   | 0.0636   |
+| IA 1: 46%                              | Z                  | 2.6664   | 0.1028   |
+| Events: 3632                           | p (1-sided)        | 0.0038   | 0.4591   |
+| Events: 31                             | ~HR at bound       | 0.2316   | 0.6708   |
+| Month: 13                              | Spending           | 0.0038   | 0.0153   |
+|                                        | P(Cross) if HR=0.7 | 0.0038   | 0.5409   |
+|                                        | P(Cross) if HR=0.3 | 0.3438   | 0.0153   |
+| IA 2: 71%                              | Z                  | 2.4301   | 0.9679   |
+| Events: 3632                           | p (1-sided)        | 0.0075   | 0.1665   |
+| Events: 48                             | ~HR at bound       | 0.3114   | 0.5070   |
+| Month: 18.1                            | Spending           | 0.0057   | 0.0230   |
+|                                        | P(Cross) if HR=0.7 | 0.0096   | 0.8419   |
+|                                        | P(Cross) if HR=0.3 | 0.6635   | 0.0383   |
+| Final                                  | Z                  | 2.0322   | 2.0322   |
+| Events: 3632                           | p (1-sided)        | 0.0211   | 0.0211   |
+| Events: 68                             | ~HR at bound       | 0.3962   | 0.3962   |
+| Month: 24                              | Spending           | 0.0154   | 0.0617   |
 |                                        | P(Cross) if HR=0.7 | 0.0239   | 0.9761   |
-|                                        | P(Cross) if HR=0.3 | 0.9022   | 0.0978   |
+|                                        | P(Cross) if HR=0.3 | 0.9018   | 0.0982   |
 
 A textual summary for the design is:
 
 ``` r
+
 cat(summary(xx, timeunit = "months"))
 ```
 
 Asymmetric two-sided group sequential design with non-binding futility
-bound, 3 analyses, time-to-event outcome with sample size 3604 and 68
+bound, 3 analyses, time-to-event outcome with sample size 3632 and 68
 events required, 90 percent power, 2.5 percent (1-sided) Type I error to
 detect a hazard ratio of 0.3 with a null hypothesis hazard ratio of 0.7.
-Enrollment and total study durations are assumed to be 8 and 24.2
-months, respectively. Efficacy bounds derived using a Hwang-Shih-DeCani
-spending function with gamma = -3. Futility bounds derived using a
+Enrollment and total study durations are assumed to be 8 and 24 months,
+respectively. Efficacy bounds derived using a Hwang-Shih-DeCani spending
+function with gamma = -3. Futility bounds derived using a
 Hwang-Shih-DeCani spending function with gamma = -3.
 
 ## Converting to an exact binomial design
@@ -263,6 +274,7 @@ and alternate (`theta` = 0.4737) hypotheses, respectively; these
 calculations are done under the exact binomial distribution assumptions.
 
 ``` r
+
 xb <- toBinomialExact(x)
 ```
 
@@ -283,53 +295,59 @@ efficacy bounds using the normal approximation that the time-to-event
 design used:
 
 ``` r
+
 efficacyNominalPValue <- pnorm(-xx$upper$bound)
 efficacyNominalPValue
 ```
 
-    #> [1] 0.003610924 0.007155713 0.021200261
+    #> [1] 0.003832879 0.007548194 0.021066070
 
 Then we took the inverse binomial distribution for these p-values
 assuming the targeted total number of cases to obtain:
 
 ``` r
+
 qbinom(p = efficacyNominalPValue, size = xx$n.I, prob = p0) - 1
 ```
 
-    #> [1] 12 23 37
+    #> [1] 13 23 37
 
 This is actually the same as the final bounds computed above:
 
 ``` r
+
 xb$lower$bound
 ```
 
-    #> [1] 12 23 37
+    #> [1] 13 24 37
 
 This and the initial approximation for the futility bound are returned
 from
 [`toBinomialExact()`](https://keaven.github.io/gsDesign/reference/toBinomialExact.md):
 
 ``` r
+
 xb$init_approx$a
 ```
 
-    #> [1] 12 23 37
+    #> [1] 13 23 37
 
 ``` r
+
 xb$init_approx$b
 ```
 
-    #> [1] 20 29 38
+    #> [1] 21 29 38
 
 For the futility bound, only a slight adjustment was required for the
 final bound:
 
 ``` r
+
 xb$upper$bound
 ```
 
-    #> [1] 21 30 38
+    #> [1] 22 30 38
 
 The vaccine efficacy at bounds should be checked to see if the evidence
 is convincing enough to be accepted as a clinically relevant benefit in
@@ -349,6 +367,7 @@ spending.
 #### \\\alpha\\-spending
 
 ``` r
+
 # Exact design cumulative alpha-spending at efficacy bounds
 # (non-binding)
 nb <- gsBinomialExact(k = xb$k, theta = xb$theta, n.I = xb$n.I, b= xb$n.I + 1, a = xb$lower$bound)
@@ -356,14 +375,15 @@ cumsum(nb$lower$prob[,1])
 ```
 
     #> Analysis  1 Analysis  2 Analysis  3 
-    #> 0.001619438 0.006447739 0.017397214
+    #> 0.002703239 0.009176778 0.018982186
 
 ``` r
+
 # Targeted alpha-spending
 xx$upper$sf(alpha, t = xx$timing, xx$upper$param)$spend
 ```
 
-    #> [1] 0.003610924 0.009107476 0.025000000
+    #> [1] 0.003832879 0.009577354 0.025000000
 
 Above we see the achieved \\\alpha\\-spending ignoring the futility
 bound is controlled at the targeted level at each analysis; because of
@@ -380,6 +400,7 @@ efficacy spending parameter as \\\gamma=-4\\ instead of \\\gamma=-3\\
 second property would not hold.
 
 ``` r
+
 # Check that increasing any bound goes above cumulative spend
 excess_alpha_spend <- matrix(0, nrow = nb$k, ncol=nb$k)
 for(i in 1:xb$k){
@@ -392,26 +413,28 @@ excess_alpha_spend
 ```
 
     #>             [,1]        [,2]       [,3]
-    #> [1,] 0.004979222 0.008826964 0.01933025
-    #> [2,] 0.001619438 0.013174419 0.02171228
-    #> [3,] 0.001619438 0.006447739 0.02856667
+    #> [1,] 0.007742914 0.012745616 0.02201467
+    #> [2,] 0.002703239 0.017820794 0.02502423
+    #> [3,] 0.002703239 0.009176778 0.02967058
 
 #### \\\beta\\-spending
 
 ``` r
+
 # Cumulative beta-spending for exact design
 cumsum(xb$upper$prob[,2])
 ```
 
     #> Analysis  1 Analysis  2 Analysis  3 
-    #>  0.01033516  0.02225609  0.09941943
+    #> 0.006760093 0.027359634 0.097411064
 
 ``` r
+
 # Targeted beta-spending
 xx$lower$sf(beta, t = xx$timing, xx$lower$param)$spend
 ```
 
-    #> [1] 0.0144437 0.0364299 0.1000000
+    #> [1] 0.01533151 0.03830942 0.10000000
 
 Since the futility bound at the final analysis is only 1 plus the
 efficacy bound, it cannot be lowered in the following. However, we see
@@ -423,6 +446,7 @@ O’Brien-Flemining-like spending function the second property did not
 hold.
 
 ``` r
+
 # Check that increasing any bound goes above cumulative spend
 excess_beta_spend <- matrix(0, nrow = nb$k - 1, ncol=nb$k)
 for(i in 1:(xb$k - 1)){
@@ -434,9 +458,9 @@ for(i in 1:(xb$k - 1)){
 excess_beta_spend
 ```
 
-    #>            [,1]       [,2]      [,3]
-    #> [1,] 0.02618462 0.03428681 0.1059802
-    #> [2,] 0.01033516 0.03746257 0.1034467
+    #>             [,1]       [,2]      [,3]
+    #> [1,] 0.017842801 0.03386750 0.1009881
+    #> [2,] 0.006760093 0.04900921 0.1046241
 
 #### Bound update at time of analysis for example 2
 
@@ -461,6 +485,7 @@ allowed \\\beta\\-spending for Type II error. Note that for this table,
 the expected sample size and calendar timing are no longer needed.
 
 ``` r
+
 ebUpdate <- toBinomialExact(xx, observedEvents = c(20, 78))
 ```
 
@@ -489,17 +514,14 @@ for Vaccine Efficacy Studies.” *Communications in Statistics-Theory and
 Methods* 27 (6): 1305–22.
 
 Jennison, Christopher, and Bruce W. Turnbull. 2000. *Group Sequential
-Methods with Applications to Clinical Trials*. Boca Raton, FL: Chapman;
-Hall/CRC.
+Methods with Applications to Clinical Trials*. Chapman; Hall/CRC.
 
 Lachin, John M., and Mary A. Foulkes. 1986. “Evaluation of Sample Size
 and Power for Analyses of Survival with Allowance for Nonuniform Patient
 Entry, Losses to Follow-up, Noncompliance, and Stratification.”
 *Biometrics* 42: 507–19.
 
-Logunov, Denis Y, Inna V Dolzhikova, Dmitry V Shcheblyakov, Amir I
-Tukhvatulin, Olga V Zubkova, Alina S Dzharullaeva, Anna V Kovyrshina, et
-al. 2021. “Safety and Efficacy of an rAd26 and rAd5 Vector-Based
-Heterologous Prime-Boost COVID-19 Vaccine: An Interim Analysis of a
-Randomised Controlled Phase 3 Trial in Russia.” *The Lancet* 397
-(10275): 671–81.
+Logunov, Denis Y, Inna V Dolzhikova, Dmitry V Shcheblyakov, et al. 2021.
+“Safety and Efficacy of an rAd26 and rAd5 Vector-Based Heterologous
+Prime-Boost COVID-19 Vaccine: An Interim Analysis of a Randomised
+Controlled Phase 3 Trial in Russia.” *The Lancet* 397 (10275): 671–81.

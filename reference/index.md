@@ -113,6 +113,12 @@ and
 
 - [`toBinomialExact()`](https://keaven.github.io/gsDesign/reference/toBinomialExact.md)
   : Translate survival design bounds to exact binomial bounds
+- [`repeatedPValueBinomialExact()`](https://keaven.github.io/gsDesign/reference/repeatedPValueBinomialExact.md)
+  : Exact binomial repeated p-values for a group sequential design
+- [`sequentialPValueBinomialExact()`](https://keaven.github.io/gsDesign/reference/sequentialPValueBinomialExact.md)
+  : Exact binomial sequential p-value for a group sequential design
+- [`simBinomialSeasonalExact()`](https://keaven.github.io/gsDesign/reference/simBinomialSeasonalExact.md)
+  : Simulate exact-binomial seasonal monitoring scenarios
 
 ## Spending Functions
 

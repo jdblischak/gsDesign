@@ -378,6 +378,7 @@ ss <- nSurvival(
 )
 xs <- gsDesign(nFixSurv = ss$n, n.fix = ss$nEvents, delta1 = log(ss$lambda2 / ss$lambda1))
 gsBoundSummary(xs, logdelta = TRUE, ratio = ss$ratio)
+#> Warning: gsBoundSummary: hr0 is not present; using hr0 = 1 for HR at bound calculations.
 #>   Analysis              Value Efficacy Futility
 #>  IA 1: 33%                  Z   3.0107  -0.2387
 #>      N: 34        p (1-sided)   0.0013   0.5943
@@ -556,8 +557,8 @@ gsBoundSummary(xOR, deltaname = "OR", logdelta = TRUE)
 xprint(xtable::xtable(gsBoundSummary(xOR, deltaname = "OR", logdelta = TRUE),
   caption = "Table caption."
 ))
-#> % latex table generated in R 4.5.3 by xtable 1.8-8 package
-#> % Thu Mar 26 15:59:24 2026
+#> % latex table generated in R 4.6.1 by xtable 1.8-8 package
+#> % Fri Jun 26 18:10:50 2026
 #> \begin{table}[ht]
 #> \centering
 #> \begin{tabular}{llrr}
